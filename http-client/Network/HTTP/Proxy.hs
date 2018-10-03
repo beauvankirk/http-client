@@ -84,7 +84,7 @@ import           Safe                        (readDef)
 import           System.IO
 import           System.Win32.Registry       (hKEY_CURRENT_USER, rEG_DWORD,
                                               regCloseKey, regOpenKey,
-                                              regQueryValue, regQueryValueEx)
+                                              regQueryDefaultValue, regQueryValueEx)
 import           System.Win32.Types          (DWORD, HKEY)
 #endif
 
@@ -176,11 +176,11 @@ registryProxyString = catch
     if enable
         then do
 #if MIN_VERSION_Win32(2, 6, 0)
-            server <- regQueryValue hkey "ProxyServer"
-            exceptions <- try $ regQueryValue hkey "ProxyOverride" :: IO (Either IOException String)
+            server <- regQueryDefaultValue hkey "ProxyServer"
+            exceptions <- try $ regQueryDefaultValue hkey "ProxyOverride" :: IO (Either IOException String)
 #else
-            server <- regQueryValue hkey (Just "ProxyServer")
-            exceptions <- try $ regQueryValue hkey (Just "ProxyOverride") :: IO (Either IOException String)
+            server <- regQueryDefaultValue hkey (Just "ProxyServer")
+            exceptions <- try $ regQueryDefaultValue hkey (Just "ProxyOverride") :: IO (Either IOException String)
 #endif
             return $ Just (server, either (const "") id exceptions)
         else return Nothing)
